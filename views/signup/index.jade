@@ -7,6 +7,10 @@ block feet
   script(src='/views/signup/index.js')
 
 block body
+
+  script(type='text/javascript')
+    var subdomainUsed = "#{subdomainUsed}";
+
   div.page-header
     h1 Sign Up
   #signup
@@ -49,6 +53,12 @@ block body
         div.controls
           input(type='text', name='username', value!='<%= username %>')
           span.help-inline <%= errfor.username %>
+      if subdomainUsed
+        div.control-group(class!='<%= errfor.subdomain ? "error" : "" %>')
+          label.control-label Claim Subdomain:
+          div.controls
+            input(type='text', name='subdomain', value!='<%= subdomain %>')
+            span.help-inline <%= errfor.subdomain %>
       div.control-group(class!='<%= errfor.email ? "error" : "" %>')
         label.control-label Enter Your Email:
         div.controls

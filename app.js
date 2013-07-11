@@ -60,6 +60,10 @@ app.configure(function(){
   app.set('facebook-oauth-key', '');
   app.set('facebook-oauth-secret', '');
 
+  //create a subdomain per user?
+  app.set("subdomain-per-user", false);
+  app.set("blacklisted-subdomains", ["cdn"]);
+
   // As an alternative set config externally in 'config.json' placed in the root of your project.
   // This overwrites the settings above for all defined key. 
   // Useful for project management stuff, git remote pushes among other things in which 

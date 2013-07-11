@@ -8,16 +8,16 @@ exports.init = function(req, res){
       oauthMessage: '',
       oauthTwitter: !!req.app.get('twitter-oauth-key'),
       oauthGitHub: !!req.app.get('github-oauth-key'),
-      oauthFacebook: !!req.app.get('facebook-oauth-key')
+      oauthFacebook: !!req.app.get('facebook-oauth-key'),
+      subdomainUsed: !!req.app.get("subdomain-per-user")
     });
   }
 };
 
-
-
 exports.signup = function(req, res){
+
   var workflow = new req.app.utility.Workflow(req, res);
-  
+
   workflow.on('validate', function() {
     if (!req.body.username) {
       workflow.outcome.errfor.username = 'required';
@@ -25,6 +25,16 @@ exports.signup = function(req, res){
     else if (!/^[a-zA-Z0-9\-\_]+$/.test(req.body.username)) {
       workflow.outcome.errfor.username = 'only use letters, numbers, \'-\', \'_\'';
     }
+
+    if(req.app.get("subdomain-per-user")){
+      if (!req.body.subdomain) {
+        workflow.outcome.errfor.subdomain = 'required';
+      }
+      else if (!/^[a-zA-Z0-9\-\_]+$/.test(req.body.subdomain)) {
+        workflow.outcome.errfor.subdomain = 'only use letters, numbers, \'-\', \'_\'';
+      }
+    }
+
     if (!req.body.email) {
       workflow.outcome.errfor.email = 'required';
     }
@@ -60,11 +70,23 @@ exports.signup = function(req, res){
         workflow.outcome.errfor.email = 'email already registered';
         return workflow.emit('response');
       }
-      
-      workflow.emit('createUser');
+      if(req.app.get("subdomain-per-user")){
+        workflow.emit('subdomainAvailabilityCheck');
+      }else{
+        workflow.emit('createUser');
+      }
     });
   });
-  
+
+  workflow.on('subdomainAvailabilityCheck', function() {
+    var requestedSubdomain = req.body.subdomain;
+    if((req.app.get("blacklisted-subdomains") || []).indexOf(requestedSubdomain) !== -1){
+      workflow.outcome.errfor.subdomain = 'subdomain already taken';
+      return workflow.emit('response');
+    }
+    workflow.emit('createUser');
+  });
+
   workflow.on('createUser', function() {
     var fieldsToSet = {
       isActive: 'yes',
@@ -152,9 +174,9 @@ exports.signup = function(req, res){
   workflow.emit('validate');
 };
 
-
-
 exports.signupTwitter = function(req, res, next) {
+  var subdomainUsed = !!req.app.get("subdomain-per-user");
+
   req._passport.instance.authenticate('twitter', function(err, user, info) {
     if (!info || !info.profile) return res.redirect('/signup/');
     
@@ -163,14 +185,15 @@ exports.signupTwitter = function(req, res, next) {
       
       if (!user) {
         req.session.socialProfile = info.profile;
-        res.render('signup/social', { email: '' });
+        res.render('signup/social', { email: '', subdomainUsed: subdomainUsed});
       }
       else {
         res.render('signup/index', {
           oauthMessage: 'We found a user linked to your Twitter account.',
           oauthTwitter: !!req.app.get('twitter-oauth-key'),
           oauthGitHub: !!req.app.get('github-oauth-key'),
-          oauthFacebook: !!req.app.get('facebook-oauth-key')
+          oauthFacebook: !!req.app.get('facebook-oauth-key'),
+          subdomainUsed: subdomainUsed
         });
       }
     });
@@ -180,6 +203,9 @@ exports.signupTwitter = function(req, res, next) {
 
 
 exports.signupGitHub = function(req, res, next) {
+
+  var subdomainUsed = !!req.app.get("subdomain-per-user");
+
   req._passport.instance.authenticate('github', function(err, user, info) {
     if (!info || !info.profile) return res.redirect('/signup/');
     
@@ -188,14 +214,15 @@ exports.signupGitHub = function(req, res, next) {
       
       if (!user) {
         req.session.socialProfile = info.profile;
-        res.render('signup/social', { email: info.profile.emails[0].value || '' });
+        res.render('signup/social', { email: info.profile.emails[0].value || '', subdomainUsed: subdomainUsed });
       }
       else {
         res.render('signup/index', {
           oauthMessage: 'We found a user linked to your GitHub account.',
           oauthTwitter: !!req.app.get('twitter-oauth-key'),
           oauthGitHub: !!req.app.get('github-oauth-key'),
-          oauthFacebook: !!req.app.get('facebook-oauth-key')
+          oauthFacebook: !!req.app.get('facebook-oauth-key'),
+          subdomainUsed: subdomainUsed
         });
       }
     });
@@ -205,6 +232,9 @@ exports.signupGitHub = function(req, res, next) {
 
 
 exports.signupFacebook = function(req, res, next) {
+
+  var subdomainUsed = !!req.app.get("subdomain-per-user");
+
   req._passport.instance.authenticate('facebook', { callbackURL: '/signup/facebook/callback/' }, function(err, user, info) {
     if (!info || !info.profile) return res.redirect('/signup/');
     
@@ -213,14 +243,15 @@ exports.signupFacebook = function(req, res, next) {
       
       if (!user) {
         req.session.socialProfile = info.profile;
-        res.render('signup/social', { email: info.profile.emails[0].value || '' });
+        res.render('signup/social', { email: info.profile.emails[0].value || '', subdomainUsed: subdomainUsed });
       }
       else {
         res.render('signup/index', {
           oauthMessage: 'We found a user linked to your Facebook account.',
           oauthTwitter: !!req.app.get('twitter-oauth-key'),
           oauthGitHub: !!req.app.get('github-oauth-key'),
-          oauthFacebook: !!req.app.get('facebook-oauth-key')
+          oauthFacebook: !!req.app.get('facebook-oauth-key'),
+          subdomainUsed: subdomainUsed
         });
       }
     });
@@ -231,7 +262,7 @@ exports.signupFacebook = function(req, res, next) {
 
 exports.signupSocial = function(req, res){
   var workflow = new req.app.utility.Workflow(req, res);
-  
+
   workflow.on('validate', function() {
     if (!req.body.email) {
       workflow.outcome.errfor.email = 'required';
@@ -239,10 +270,19 @@ exports.signupSocial = function(req, res){
     else if (!/^[a-zA-Z0-9\-\_\.\+]+@[a-zA-Z0-9\-\_\.]+\.[a-zA-Z0-9\-\_]+$/.test(req.body.email)) {
       workflow.outcome.errfor.email = 'invalid email format';
     }
-    
+
+    if(req.app.get("subdomain-per-user")){
+      if (!req.body.subdomain) {
+        workflow.outcome.errfor.subdomain = 'required';
+      }
+      else if (!/^[a-zA-Z0-9\-\_]+$/.test(req.body.subdomain)) {
+        workflow.outcome.errfor.subdomain = 'only use letters, numbers, \'-\', \'_\'';
+      }
+    }
+
     //return if we have errors already
     if (workflow.hasErrors()) return workflow.emit('response');
-    
+
     workflow.emit('duplicateUsernameCheck');
   });
   
@@ -274,11 +314,23 @@ exports.signupSocial = function(req, res){
         workflow.outcome.errfor.email = 'email already registered';
         return workflow.emit('response');
       }
-      
-      workflow.emit('createUser');
+      if(req.app.get("subdomain-per-user")){
+        workflow.emit('subdomainAvailabilityCheck');
+      }else{
+        workflow.emit('createUser');
+      }
     });
   });
-  
+
+  workflow.on('subdomainAvailabilityCheck', function() {
+    var requestedSubdomain = req.body.subdomain;
+    if((req.app.get("blacklisted-subdomains") || []).indexOf(requestedSubdomain) !== -1){
+      workflow.outcome.errfor.subdomain = 'subdomain already taken';
+      return workflow.emit('response');
+    }
+    workflow.emit('createUser');
+  });
+
   workflow.on('createUser', function() {
     var fieldsToSet = {
       isActive: 'yes',

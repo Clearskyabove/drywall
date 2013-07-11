@@ -13,6 +13,7 @@ exports = module.exports = function(app, mongoose) {
     twitter: {},
     github: {},
     facebook: {},
+    subdomain: String,
     search: [String]
   });
   userSchema.methods.canPlayRoleOf = function(role) {
