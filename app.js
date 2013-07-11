@@ -35,7 +35,7 @@ app.configure(function(){
   app.set('company-name', 'Acme, Inc.');
   app.set('admin-email', 'your@email.addy');
   app.set('crypto-key', 'k3yb0ardc4t');
-  
+
   //email (smtp) settings
   app.set('email-from-name', app.get('project-name')+ ' Website');
   app.set('email-from-address', 'your@email.addy');
@@ -45,20 +45,39 @@ app.configure(function(){
     host: 'smtp.gmail.com',
     ssl: true
   });
-  
+
   //twitter settings
   app.set('twitter-oauth-key', '');
   app.set('twitter-oauth-secret', '');
-  
+
   //github settings
   app.set('github-oauth-key', '');
   app.set('github-oauth-secret', '');
-  
+
   //facebook settings
   app.set('facebook-oauth-key', '');
   app.set('facebook-oauth-secret', '');
-  
-  //middleware
+
+  // As an alternative set config externally in 'config.json' placed in the root of your project.
+  // This overwrites the settings above for all defined key. 
+  // Useful for project management stuff, git remote pushes among other things in which 
+  // you likely don't want to expose sensitive info: doing a gitignore on config.json and you're done.
+  // NOTE: 
+  var externalconfig = require("./config.json");
+  if(externalconfig){
+    for (var key in externalconfig) {
+      app.set(key,externalconfig[key]);
+    }
+    //the following should take precedence
+    if(process.env.PORT){
+      app.set('port', process.env.PORT);
+    }
+    if(process.env.MONGOLAB_URI || process.env.MONGOHQ_URL){
+       app.set('mongodb-uri', process.env.MONGOLAB_URI || process.env.MONGOHQ_URL);
+    }
+  }
+
+    //middleware
   app.use(express.favicon(__dirname + '/public/favicon.ico'));
   app.use(express.logger('dev'));
   app.use(express.static(path.join(__dirname, 'public')));
@@ -72,10 +91,10 @@ app.configure(function(){
   app.use(passport.initialize());
   app.use(passport.session());
   app.use(app.router);
-  
+
   //error handler
   app.use(require('./views/http/index').http500);
-  
+
   //locals
   app.locals.projectName = app.get('project-name');
   app.locals.copyrightYear = new Date().getFullYear();
