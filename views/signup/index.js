@@ -1,58 +1,3 @@
-var sendWelcomeEmail = function(req,res,workflow){
-  req.app.utility.email(req, res, {
-    from: req.app.get('email-from-name') +' <'+ req.app.get('email-from-address') +'>',
-    to: req.body.email,
-    subject: 'Your '+ req.app.get('project-name') +' Account',
-    textPath: 'signup/email-text',
-    htmlPath: 'signup/email-html',
-    locals: {
-      username: req.body.username,
-      email: req.body.email,
-      loginURL: 'http://'+ req.headers.host +'/login/',
-      projectName: req.app.get('project-name')
-    },
-    success: function(message) {
-      workflow.emit('logUserIn');
-    },
-    error: function(err) {
-      console.log('Error Sending Welcome Email: '+ err);
-      workflow.emit('logUserIn');
-    }
-  });
-};
-
-var subdomainAvailabilityCheck = function(req,res,workflow){
-  var requestedSubdomain = req.body.subdomain;
-  if((req.app.get("blacklisted-subdomains") || []).indexOf(requestedSubdomain) !== -1){
-    workflow.outcome.errfor.subdomain = 'subdomain already taken';
-    return workflow.emit('response');
-  }
-  req.app.db.models.User.findOne({ subdomain: req.body.subdomain }, function(err, user) {
-    if (err) return workflow.emit('exception', err);
-    if (user) {
-      workflow.outcome.errfor.subdomain = 'subdomain already taken';
-      return workflow.emit('response');
-    }
-    workflow.emit('createUser');
-  });
-};
-
-var duplicateEmailCheck = function(req, res, workflow, subdomainUsed){
-  req.app.db.models.User.findOne({ email: req.body.email }, function(err, user) {
-    if (err) return workflow.emit('exception', err);
-
-    if (user) {
-      workflow.outcome.errfor.email = 'email already registered';
-      return workflow.emit('response');
-    }
-    if(subdomainUsed){
-      workflow.emit('subdomainAvailabilityCheck');
-    }else{
-      workflow.emit('createUser');
-    }
-  });
-};
-
 exports.init = function(req, res){
   //are we logged in?
   if (req.isAuthenticated()) { 
@@ -400,4 +345,59 @@ exports.signupSocial = function(req, res){
   });
 
   workflow.emit('validate');
+};
+
+var sendWelcomeEmail = function(req,res,workflow){
+  req.app.utility.email(req, res, {
+    from: req.app.get('email-from-name') +' <'+ req.app.get('email-from-address') +'>',
+    to: req.body.email,
+    subject: 'Your '+ req.app.get('project-name') +' Account',
+    textPath: 'signup/email-text',
+    htmlPath: 'signup/email-html',
+    locals: {
+      username: req.body.username,
+      email: req.body.email,
+      loginURL: 'http://'+ req.headers.host +'/login/',
+      projectName: req.app.get('project-name')
+    },
+    success: function(message) {
+      workflow.emit('logUserIn');
+    },
+    error: function(err) {
+      console.log('Error Sending Welcome Email: '+ err);
+      workflow.emit('logUserIn');
+    }
+  });
+};
+
+var subdomainAvailabilityCheck = function(req,res,workflow){
+  var requestedSubdomain = req.body.subdomain;
+  if((req.app.get("blacklisted-subdomains") || []).indexOf(requestedSubdomain) !== -1){
+    workflow.outcome.errfor.subdomain = 'subdomain already taken';
+    return workflow.emit('response');
+  }
+  req.app.db.models.User.findOne({ subdomain: req.body.subdomain }, function(err, user) {
+    if (err) return workflow.emit('exception', err);
+    if (user) {
+      workflow.outcome.errfor.subdomain = 'subdomain already taken';
+      return workflow.emit('response');
+    }
+    workflow.emit('createUser');
+  });
+};
+
+var duplicateEmailCheck = function(req, res, workflow, subdomainUsed){
+  req.app.db.models.User.findOne({ email: req.body.email }, function(err, user) {
+    if (err) return workflow.emit('exception', err);
+
+    if (user) {
+      workflow.outcome.errfor.email = 'email already registered';
+      return workflow.emit('response');
+    }
+    if(subdomainUsed){
+      workflow.emit('subdomainAvailabilityCheck');
+    }else{
+      workflow.emit('createUser');
+    }
+  });
 };
