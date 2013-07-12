@@ -5,6 +5,7 @@ var express = require('express')
   , path = require('path')
   , passport = require('passport')
   , mongoose = require('mongoose')
+  , toobusy = require('toobusy')
 ;
 
 //create express app
@@ -79,7 +80,15 @@ app.configure(function(){
     }
   }
 
-    //middleware
+  //middleware
+
+  //https://hacks.mozilla.org/2013/01/building-a-node-js-server-that-wont-melt-a-node-js-holiday-season-part-5/
+  app.use(function(req, res, next) {
+    // check if we're toobusy() - note, this call is extremely fast, and returns
+    // state that is cached at a fixed interval
+    if (toobusy()) res.send(503, "I'm busy right now, sorry.");
+    else next();
+  });
   app.use(express.favicon(__dirname + '/public/favicon.ico'));
   app.use(express.logger('dev'));
   app.use(express.static(path.join(__dirname, 'public')));
