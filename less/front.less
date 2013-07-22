@@ -3,14 +3,34 @@
 @import "bootstrap/mixins.less";
 
 
-/* Home */
-@c_blueLight_back: #a2b3ce;
+.hero{
+  background: url('/media/back.jpg') 0 -50px no-repeat ;
+  background-size: cover;
+  min-height: 580px;
+  @media (min-width:1300px) {
+    background-position: 0 -100px;
+  }
+  @media (min-width:1450px) {
+    background-position: 0 -150px;
+  }
+  @media (min-width:1600px) {
+    background-position: 0 -200px;
+  }
+  @media (min-width:1750px) {
+    background-position: 0 -250px;
+  }
+   @media (min-width:1900px) {
+    background-position: 0 -300px;
+  }
+}
+
 @padleftright:20px;
 .cont{
   padding: 0 @padleftright
 }
 
 .main{
+  @c_blueLight_back: #a2b3ce;
   @rightwidth: 400px;
   @leftmaxwidth: 450px;
   @maxgap: 120px;

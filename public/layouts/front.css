@@ -25,7 +25,36 @@
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
-/* Home */
+.hero {
+  background: url('/media/back.jpg') 0 -50px no-repeat;
+  background-size: cover;
+  min-height: 580px;
+}
+@media (min-width: 1300px) {
+  .hero {
+    background-position: 0 -100px;
+  }
+}
+@media (min-width: 1450px) {
+  .hero {
+    background-position: 0 -150px;
+  }
+}
+@media (min-width: 1600px) {
+  .hero {
+    background-position: 0 -200px;
+  }
+}
+@media (min-width: 1750px) {
+  .hero {
+    background-position: 0 -250px;
+  }
+}
+@media (min-width: 1900px) {
+  .hero {
+    background-position: 0 -300px;
+  }
+}
 .cont {
   padding: 0 20px;
 }
