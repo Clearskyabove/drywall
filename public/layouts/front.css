@@ -1,0 +1,77 @@
+.clearfix {
+  *zoom: 1;
+}
+.clearfix:before,
+.clearfix:after {
+  display: table;
+  content: "";
+  line-height: 0;
+}
+.clearfix:after {
+  clear: both;
+}
+.hide-text {
+  font: 0/0 a;
+  color: transparent;
+  text-shadow: none;
+  background-color: transparent;
+  border: 0;
+}
+.input-block-level {
+  display: block;
+  width: 100%;
+  min-height: 30px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+/* Home */
+.cont {
+  padding: 0 20px;
+}
+.main {
+  margin: 0 auto;
+  /* default [880,930]*/
+
+  /* above 1010px -> fix to 1010px */
+
+}
+.main .left {
+  float: left;
+  width: 100%;
+  padding: 60px 0 0 0 ;
+}
+.main .left > div {
+  float: left;
+  margin-right: 440px;
+}
+.main #right {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  padding: 80px 20px 40px;
+  background: #a2b3ce;
+  float: left;
+  width: 400px;
+  margin-left: -400px;
+  min-height: 260px;
+  /* 80 + 40 padding + 140px content */
+
+}
+@media (min-width: 930px) {
+  .main {
+    /* from now gap starts to grow from [40,120] */
+  
+  }
+  .main .left > div {
+    width: 450px;
+  }
+}
+@media (min-width: 1010px) {
+  .main {
+    width: 1010px;
+  }
+  .main .left > div {
+    margin-right: 120px;
+  }
+}

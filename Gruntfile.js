@@ -21,7 +21,6 @@ module.exports = function(grunt) {
     //   files     : ['public/**/*']
     // }
 
-    //TODO: NOT WORKING YET? WHY?
     less:{
       options: {
         paths: ['less'] //dir to scan for @import directives
@@ -43,8 +42,14 @@ module.exports = function(grunt) {
         //tasks: ['jshint']
       },
       less: {
-        files: ['less/**/*.less'],
+        files: [
+          'less/*.less',  //don't check nested stuff (like bootstrap)
+          'views/**/*.less'
+        ],
         tasks: ['less']
+      },
+      jade: {
+        files:["views/**/*.jade"]
       }
     }
 

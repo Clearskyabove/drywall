@@ -1,0 +1,57 @@
+//be able to use bootstrap mixins etc
+@import "bootstrap/variables.less"; // Modify this for custom colors, font-sizes, etc
+@import "bootstrap/mixins.less";
+
+
+/* Home */
+@c_blueLight_back: #a2b3ce;
+@padleftright:20px;
+.cont{
+  padding: 0 @padleftright
+}
+
+.main{
+  @rightwidth: 400px;
+  @leftmaxwidth: 450px;
+  @maxgap: 120px;
+  @minFix: 1010px; // annoyingly doesn't seem to translate when pushed in to media-query
+        //actual value: (2* @padleftright) + @leftmaxwidth + @maxgap + @rightwidth;
+  margin: 0 auto;
+  .leftRightMixin( @gap: 40px){
+    .left{
+      float:left; 
+      width: 100%;
+      padding: 60px 0 0 0 ;
+      > div{
+        float:left;
+        margin-right: @rightwidth + @gap;
+      }
+    }
+    #right{
+      .box-sizing(border-box);
+      padding: 80px 20px 40px;
+      background: @c_blueLight_back;
+      float:left;
+      width: @rightwidth;
+      margin-left: -@rightwidth ;
+      min-height: 260px; /* 80 + 40 padding + 140px content */
+    }
+  }
+  .leftRightMixin(); /* default [880,930]*/
+  @media (min-width: 930px) { /* from now gap starts to grow from [40,120] */
+    .left > div{
+      width: @leftmaxwidth;
+    }
+  }
+
+  /* above 1010px -> fix to 1010px */
+  @media (min-width:@minFix) {
+    width: @minFix;
+    .left > div{
+      margin-right:@maxgap;
+    }
+  }
+}
+
+
+

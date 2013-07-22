@@ -1,0 +1,29 @@
+doctype 5
+html
+  head
+    block head
+      title #{title}
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    link(rel='stylesheet', href='/vendor/bootstrap/css/bootstrap.min.css')
+    link(rel='stylesheet', href='/vendor/bootstrap/css/bootstrap-responsive.min.css')
+    link(rel='stylesheet', href='/vendor/font-awesome/css/font-awesome.min.css')
+    link(rel='stylesheet', href='/layouts/utility.css')
+    link(rel='stylesheet', href='/layouts/front.css')
+    block neck
+  body
+    
+    div.page
+      div.cont
+        block body
+    
+    
+    div.ajax-spinner
+      img(src='/media/ajax-pulse.gif')
+    
+    script(src='/vendor/jquery/jquery-1.9.1.min.js')
+    script(src='/vendor/underscore/underscore-min.js')
+    script(src='/vendor/backbone/backbone-min.js')
+    script(src='/vendor/bootstrap/js/bootstrap.min.js')
+    script(src='/layouts/utility.js')
+    
+    block feet
