@@ -18,6 +18,12 @@
     "passport-twitter": "~0.1.5",
     "passport-facebook": "~0.1.5",
     "passport-github": "~0.1.4",
-    "bcrypt":"~0.7.6"
+    "bcrypt": "~0.7.6"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-uglify": "~0.2.2",
+    "grunt-contrib-less": "~0.6.4",
+    "grunt-contrib-watch": "~0.5.1"
   }
 }

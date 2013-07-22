@@ -62,7 +62,7 @@ app.configure(function(){
   app.set('facebook-oauth-secret', '');
 
   // As an alternative set config externally in 'config.json' placed in the root of your project.
-  // This overwrites the settings above for all defined key. 
+  // This overwrites the settings above for all defined keys. 
   // Useful for project management stuff, git remote pushes among other things in which 
   // you likely don't want to expose sensitive info: doing a gitignore on config.json and you're done.
   // NOTE: 
@@ -89,7 +89,7 @@ app.configure(function(){
     if (toobusy()) res.send(503, "I'm busy right now, sorry.");
     else next();
   });
-  
+
   app.use(express.favicon(__dirname + '/public/favicon.ico'));
   app.use(express.logger('dev'));
   app.use(express.static(path.join(__dirname, 'public')));
